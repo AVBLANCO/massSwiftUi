@@ -14,6 +14,7 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     private let manager = CLLocationManager()
     @Published var location: CLLocation?
     @Published var locationStatus: CLAuthorizationStatus?
+    
 
     var locationStatusText: String {
         switch locationStatus {

@@ -33,7 +33,7 @@ struct InfoView: View {
                 }
 
                 Section(header: Text("Registrar Nueva Tarjeta")) {
-                    HStack {
+                    VStack {
                         TextField("Serial de Tarjeta Tullave", text: $serialInput)
                             .keyboardType(.numberPad)
                             .textFieldStyle(.roundedBorder)
@@ -135,14 +135,5 @@ struct CardListRow: View {
     }
 }
 
-extension CardViewModel {
-    func setActiveCard(_ card: TullaveCard) {
-        // Implementación requerida en CardViewModel:
-        // 1. Recorrer todas las tarjetas en el contexto de SwiftData y poner isActive = false.
-        // 2. Establecer la tarjeta seleccionada (card) como isActive = true.
-        // 3. Opcional: Actualizar activeCardInfo con la información de la card.
-        print("Tarjeta \(card.serial) seleccionada y configurada como activa.")
-    }
-}
 
 

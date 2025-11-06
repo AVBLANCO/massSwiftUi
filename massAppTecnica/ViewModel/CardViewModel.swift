@@ -137,4 +137,13 @@ final class CardViewModel: ObservableObject {
 
         isLoading = false
     }
+
+    func setActiveCard(_ card: TullaveCard) {
+        // Implementación requerida en CardViewModel:
+        // 1. Recorrer todas las tarjetas en el contexto de SwiftData y poner isActive = false.
+        // 2. Establecer la tarjeta seleccionada (card) como isActive = true.
+        // 3. Opcional: Actualizar activeCardInfo con la información de la card.
+        print("Tarjeta \(card.serial) seleccionada y configurada como activa.")
+    }
+
 }

@@ -13,6 +13,7 @@ extension Color {
     static let maasPrimary = Color(red: 0.40, green: 0.76, blue: 0.16) // Verde principal (Botón Continuar)
     static let maasDark = Color(red: 0.17, green: 0.20, blue: 0.22) // Negro/Gris oscuro para textos y títulos (Display Large)
     static let maasLightBackground = Color(red: 0.98, green: 0.98, blue: 0.96) // Fondo claro para inputs (Casi blanco/crema)
+    static let maasBalanceBlue = Color(red: 0.38, green: 0.40, blue: 0.90) // Nuevo color azul/púrpura para el saldo
     static let maasSuccess = Color(red: 0.15, green: 0.53, blue: 0.14) // Tono de verde más oscuro (Hover)
     static let maasError = Color.red // Rojo estándar para errores
     static let tullaveCardGradientStart = Color(red: 0.50, green: 0.82, blue: 0.19) // Verde claro de la tarjeta
