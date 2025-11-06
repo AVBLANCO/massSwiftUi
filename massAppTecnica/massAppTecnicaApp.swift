@@ -12,21 +12,26 @@ import SwiftData
 struct massAppTecnicaApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            TullaveCard.self, // Usamos tu modelo TullaveCard
         ])
+
+        // isStoredInMemoryOnly: false (por defecto en SwiftData) asegura que los datos sean persistentes.
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // Un error fatal si la inicialización de la base de datos falla
+            fatalError("No se pudo crear el ModelContainer para SwiftData: \(error)")
         }
     }()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // Establecemos la vista raíz de tu aplicación modular
+            MainTabView()
         }
+        // Inyectamos el contenedor de modelos en el entorno de la aplicación
         .modelContainer(sharedModelContainer)
     }
 }
