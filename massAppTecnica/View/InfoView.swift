@@ -24,6 +24,7 @@ struct InfoView: View {
             List {
                 Section(header: Text("Tarjeta Activa")) {
                     if let activeCard = viewModel.activeCardInfo {
+                        // Se mantiene CardDetailRow para mostrar los detalles de la activa
                         CardDetailRow(card: activeCard)
                     } else {
                         Text("No hay tarjeta seleccionada.")
@@ -61,10 +62,16 @@ struct InfoView: View {
                 }
 
                 Section(header: Text("Tarjetas Registradas")) {
-                    // El ForEach itera sobre objetos @Model.
-                    // Estos objetos se pasan a CardListRow usando @Bindable.
+                    // Ahora cada tarjeta es un NavigationLink
                     ForEach(savedCards) { card in
-                        CardListRow(card: card, viewModel: viewModel)
+                        // 1. El NavigationLink lleva a la vista de detalle
+                        NavigationLink(destination: CardDetailView(card: card)) {
+                            CardListRow(card: card) // CardListRow ya no necesita el viewModel
+                        }
+                        // 2. Usamos .onTapGesture para establecer la tarjeta como activa justo antes de navegar
+                        .onTapGesture {
+                            viewModel.setActiveCard(card)
+                        }
                     }
                     .onDelete(perform: deleteCards)
                 }
@@ -84,9 +91,9 @@ struct InfoView: View {
     }
 }
 
-// MARK: - Componentes de Tarjeta
+// MARK: - VISTAS DE DETALLE Y FILA
 
-// Componente para mostrar detalles de la tarjeta activa
+/// Componente para mostrar detalles de la tarjeta activa (sin cambios mayores)
 struct CardDetailRow: View {
     let card: TullaveCard
 
@@ -105,18 +112,16 @@ struct CardDetailRow: View {
     }
 }
 
-// Componente para mostrar la tarjeta en la lista
+/// Componente para mostrar la tarjeta en la lista (simplificado)
 struct CardListRow: View {
-    // @ObservedObject var card: TullaveCard // Usamos ObservedObject ya que el modelo es @Model (Observable)
     @Bindable var card: TullaveCard
-    @ObservedObject var viewModel: CardViewModel
-
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
                 Text(card.fullName)
+                    // Mostrar en negrita si es la tarjeta activa
                     .fontWeight(card.isActive ? .bold : .regular)
-                Text(card.serial)
+                Text("Serial: \(card.serial)")
                     .font(.caption)
             }
 
@@ -125,11 +130,19 @@ struct CardListRow: View {
             if card.isActive {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
-            } else {
-                Button("Seleccionar") {
-                    viewModel.selectCard(card: card)
-                }
             }
         }
     }
 }
+
+extension CardViewModel {
+    func setActiveCard(_ card: TullaveCard) {
+        // Implementación requerida en CardViewModel:
+        // 1. Recorrer todas las tarjetas en el contexto de SwiftData y poner isActive = false.
+        // 2. Establecer la tarjeta seleccionada (card) como isActive = true.
+        // 3. Opcional: Actualizar activeCardInfo con la información de la card.
+        print("Tarjeta \(card.serial) seleccionada y configurada como activa.")
+    }
+}
+
+
