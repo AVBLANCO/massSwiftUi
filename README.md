@@ -23,7 +23,7 @@ Separamos la lógica de `CLLocationManager` ya que es un servicio que puede ser 
 ---
 
 ### 4. ⚙️ ViewModel (Lógica y Estado)
-El antiguo `CardManager` ahora es `CardViewModel` y se enfoca en la lógica que interactúa con el modelo (`TullaveCard`) y los servicios (`NetworkManager`).
+El  `CardViewModel` y se enfoca en la lógica que interactúa con el modelo (`TullaveCard`) y los servicios (`NetworkManager`).
 
 ---
 
