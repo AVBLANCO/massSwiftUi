@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     // El CardViewModel se crea e inyecta aquí.
-    // Esta es la capa que mantiene el estado global de la aplicación.
+    @Environment(\.modelContext) private var modelContext
     @StateObject var cardViewModel = CardViewModel()
 
     var body: some View {
@@ -32,7 +32,20 @@ struct MainTabView: View {
                     Label("Información", systemImage: "creditcard.fill")
                 }
         }
-        // Inyectamos el ViewModel en el entorno para que InfoView lo acceda
+        .accentColor(.maasPrimary)
+        .onAppear {
+            let unselectedColor = UIColor.white.withAlphaComponent(0.7)
+            let appearance = UITabBarAppearance()
+
+            appearance.stackedLayoutAppearance.normal.iconColor = unselectedColor
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+                .foregroundColor: unselectedColor
+            ]
+            appearance.backgroundColor = UIColor(Color.maasDark)
+            UITabBar.appearance().standardAppearance = appearance
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+            cardViewModel.setup(context: modelContext)
+        }
         .environmentObject(cardViewModel)
     }
 }

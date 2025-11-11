@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 
 // MARK: - Modelos de Datos para la API
@@ -67,6 +68,14 @@ struct Itinerary: Decodable, Identifiable {
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: TimeInterval(duration)) ?? "N/A"
     }
+
+    var formattedFare: String {
+        guard let fareCents = fare?.fare.regular?.cents else {
+            return "Tarifa no disponible"
+        }
+        let fareAmount = Double(fareCents) / 100.0
+        return String(format: "$\\(%.2f", fareAmount)
+    }
 }
 
 struct Leg: Decodable, Identifiable {
@@ -94,4 +103,56 @@ struct Leg: Decodable, Identifiable {
     struct LegGeometry: Decodable {
         let points: String
     }
+
+    // Propiedad calculada para obtener el color de ruta como Color de SwiftUI
+    var color: Color {
+        guard let hex = routeColor, let uiColor = UIColor(hex: hex) else {
+            // Color por defecto para caminar o modos sin color específico
+            return mode == "WALK" ? .gray : .maasPrimary
+        }
+        return Color(uiColor)
+    }
+
+    // Propiedad calculada para obtener el icono SFSymbol correspondiente
+    var icon: String {
+        switch mode {
+        case "WALK": return "figure.walk"
+        case "BUS": return "bus.fill"
+        case "TRAM": return "tram.fill"
+        case "SUBWAY": return "train.subway.tunnel"
+        default: return "point.fill"
+        }
+    }
+
+    // Propiedad calculada para el nombre del segmento
+    var segmentDescription: String {
+        switch mode {
+        case "WALK":
+            let distanceKm = (distance / 1000.0).formatted(.number.precision(.fractionLength(2)))
+            return "Caminar \(distanceKm) km hasta \(to.name ?? "destino")"
+        case "BUS", "TRAM", "SUBWAY":
+            let routeName = routeShortName ?? routeLongName ?? "Ruta sin nombre"
+            return "Tomar \(routeName) desde \(from.name ?? "origen")"
+        default:
+            return "Viaje en \(mode)"
+        }
+    }
 }
+
+struct RouteStep: Identifiable {
+    let id = UUID()
+    let time: String
+    let description: String
+    let iconName: String
+    let duration: String?
+    let detailLines: [String] // Para detalles como transbordos o paradas
+}
+
+/// Estructura para simular el resultado completo de la ruta.
+struct RouteResult {
+    let startTime: String
+    let endTime: String
+    let totalDuration: String
+    let steps: [RouteStep]
+}
+

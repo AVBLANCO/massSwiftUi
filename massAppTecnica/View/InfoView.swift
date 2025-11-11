@@ -57,8 +57,9 @@ struct InfoView: View {
                                 .focused($serialFieldFocused)
 
                             if viewModel.isLoading {
+                                // Se elimina .frame(maxWidth: .infinity) para evitar posibles NaN/conflictos de diseño en List
                                 ProgressView("Verificando...")
-                                    .frame(maxWidth: .infinity, alignment: .center)
+                                    .frame(alignment: .center)
                                     .foregroundColor(.maasPrimary)
                             } else {
                                 // Botón "Verificar y Registrar" (Fondo Verde Principal)
@@ -67,6 +68,8 @@ struct InfoView: View {
                                         // Pasa la lista de tarjetas para la verificación de duplicados.
                                         await viewModel.registerCard(serial: serialInput, allSavedCards: savedCards)
                                         serialInput = ""
+                                        // Opcional: Cerrar el teclado después de registrar
+                                        serialFieldFocused = false
                                     }
                                 } label: {
                                     Text("Verificar y Registrar")
@@ -119,18 +122,13 @@ struct InfoView: View {
                 }
                 .scrollContentBackground(.hidden) // Oculta el fondo blanco de la lista
                 .listStyle(.grouped)
-                .gesture(
-                    TapGesture()
-                        .onEnded { _ in
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                        }
-                )
+                // Se elimina el TapGesture que usaba el hack de UIKit para el teclado.
             }
             .navigationTitle("Gestión Tullave")
             .toolbarColorScheme(.dark, for: .navigationBar)
             .onAppear {
                 viewModel.setup(context: modelContext)
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                // Se elimina el hack de UIKit para el teclado.
             }
             .onDisappear {
                 serialFieldFocused = false

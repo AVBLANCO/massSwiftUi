@@ -10,6 +10,7 @@ import SwiftData
 import SwiftUI
 
 /// Clase principal que gestiona el estado de la aplicación y la interacción con SwiftData y NetworkManager.
+@MainActor // AÑADIDO: Asegura que todas las modificaciones de @Published y SwiftData se hagan en el hilo principal.
 final class CardViewModel: ObservableObject {
     @Published var activeCardInfo: TullaveCard?
     @Published var registrationError: String?
@@ -111,7 +112,7 @@ final class CardViewModel: ObservableObject {
 
         do {
             // 2. Validar tarjeta con la API
-           // let cardData = try await networkManager.fetchCardInfo(serial: cleanSerial)
+            // let cardData = try await networkManager.fetchCardInfo(serial: cleanSerial)
             let cardData = try await networkManager.fetchCardInformation(serial: cleanSerial)
 
             // 3. Desactivar la tarjeta activa anterior (si existe)
@@ -132,7 +133,7 @@ final class CardViewModel: ObservableObject {
             registrationError = error.localizedDescription
             self.activeCardInfo = nil
         } catch {
-             registrationError = "Un error inesperado ocurrió: \(error.localizedDescription)"
+            registrationError = "Un error inesperado ocurrió: \(error.localizedDescription)"
         }
 
         isLoading = false
@@ -145,5 +146,25 @@ final class CardViewModel: ObservableObject {
         // 3. Opcional: Actualizar activeCardInfo con la información de la card.
         print("Tarjeta \(card.serial) seleccionada y configurada como activa.")
     }
+
+    func fetchBalance(for card: TullaveCard) async {
+        // Dado que toda la clase es @MainActor, no necesitamos MainActor.run
+        // El guard let context = modelContext es seguro porque el contexto de un ModelContainer
+        // se puede acceder desde el MainActor.
+
+        isLoading = true
+        do {
+            let balanceResponse = try await networkManager.fetchCardBalance(serial: card.serial)
+
+            // Todas las modificaciones de estado y SwiftData están garantizadas en el MainActor
+            card.balance = Double(balanceResponse.balance) // Actualiza el balance de la tarjeta
+            try modelContext?.save() // Guarda los cambios en el contexto
+
+        } catch {
+            print("Error al consultar saldo: \(error.localizedDescription)")
+        }
+        isLoading = false
+    }
+
 
 }

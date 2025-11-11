@@ -11,9 +11,7 @@ import Foundation
 /// Vista para mostrar el detalle de una tarjeta seleccionada.
 struct CardDetailView: View {
     let card: TullaveCard
-
-    // Datos simulados para la nueva sección de balance/saldo
-    @State private var currentBalance: Double = 3450.0 // Saldo simulado en pesos
+    @EnvironmentObject var viewModel: CardViewModel
     @State private var lastUpdate: Date = Date()
     @State private var isBalanceButtonTapped = false
 
@@ -22,8 +20,9 @@ struct CardDetailView: View {
             VStack(alignment: .leading, spacing: 25) {
                 TullaveCardDisplay(card: card)
                     .padding(.horizontal, 20)
+
                 SectionView(title: "Saldo") {
-                    BalanceButton(balance: currentBalance)
+                    BalanceButton(balance: card.balance)
                         .onTapGesture {
                             isBalanceButtonTapped.toggle()
                         }
@@ -58,16 +57,21 @@ struct CardDetailView: View {
                 }
                 .padding(.horizontal, 20)
 
-
                 Spacer()
             }
             .padding(.top, 10)
         }
-        .background(Color.black.ignoresSafeArea()) // Fondo oscuro
-        .navigationTitle("Detalles de Tarjeta") // Título genérico
+        .background(Color.black.ignoresSafeArea())
+        .navigationTitle("Detalles de Tarjeta")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .foregroundColor(.white) // Asegura que todo el texto sea visible
+        .foregroundColor(.white)
+        .onAppear {
+            Task {
+                await viewModel.fetchBalance(for: card)
+                lastUpdate = Date()
+            }
+        }
     }
 
     private func formattedDate(_ date: Date?) -> String {

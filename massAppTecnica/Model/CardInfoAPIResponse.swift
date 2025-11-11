@@ -30,7 +30,6 @@ struct CardInformationAPIResponse: Codable {
     let cardNumber: String
     let profileCode: String
     let profile: String
-    // Usamos 'profile_es' como opcional ya que no está claro si siempre viene
     let profile_es: String?
     let bankCode: String
     let bankName: String

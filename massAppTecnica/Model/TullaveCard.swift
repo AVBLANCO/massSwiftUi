@@ -17,26 +17,37 @@ final class TullaveCard {
     var profile: String
     var isActive: Bool // Indica si es la tarjeta seleccionada actualmente
     var registeredDate: Date
+    var balance: Double
 
-    init(serial: String, fullName: String, profile: String, isActive: Bool = false) {
+    init(
+        serial: String,
+        fullName: String,
+        profile: String,
+        registeredDate: Date,
+        isActive: Bool,
+        balance: Double = 0.0
+    ) {
         self.serial = serial
         self.fullName = fullName
         self.profile = profile
         self.isActive = isActive
-        self.registeredDate = Date()
+        self.registeredDate = registeredDate
+        self.balance = balance
     }
 
     // Función de conveniencia para crear desde la respuesta del API de Información de Tarjeta
     convenience init(from apiResponse: CardInformationAPIResponse, isActive: Bool = false) {
         // Mapeamos userName y userLastName a fullName
         let fullUserName = "\(apiResponse.userName) \(apiResponse.userLastName)"
-
         self.init(
             // El número de tarjeta (cardNumber) se mapea a nuestro campo serial
             serial: apiResponse.cardNumber,
             fullName: fullUserName,
             profile: apiResponse.profile,
-            isActive: isActive
+            registeredDate: Date(),
+            isActive: isActive,
+            balance: 0.0
         )
     }
 }
+
