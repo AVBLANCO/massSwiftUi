@@ -14,14 +14,16 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     private let manager = CLLocationManager()
     @Published var location: CLLocation?
     @Published var locationStatus: CLAuthorizationStatus?
-    
 
     var locationStatusText: String {
         switch locationStatus {
         case .notDetermined: return "Buscando ubicación..."
         case .authorizedWhenInUse, .authorizedAlways:
-            return location != nil ? "Ubicación obtenida" : "Obteniendo ubicación..."
-        case .denied, .restricted: return "Permiso de ubicación denegado."
+            if let loc = location {
+                return "Ubicación GPS: \(loc.coordinate.latitude.formatted(.number.precision(.fractionLength(4)))), \(loc.coordinate.longitude.formatted(.number.precision(.fractionLength(4))))"
+            }
+            return "Obteniendo ubicación..."
+        case .denied, .restricted: return "Permiso de ubicación denegado. Active en Ajustes."
         default: return "Cargando..."
         }
     }
@@ -42,7 +44,9 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let newLocation = locations.first {
-            location = newLocation
+            if location == nil || newLocation.distance(from: location!) > 10 {
+                location = newLocation
+            }
         }
     }
 

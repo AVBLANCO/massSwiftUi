@@ -13,11 +13,9 @@ import SwiftData
 struct InfoView: View {
     @EnvironmentObject var viewModel: CardViewModel
     @Environment(\.modelContext) private var modelContext // Inyección del contexto de SwiftData
+    @FocusState private var serialFieldFocused: Bool
 
     @State private var serialInput: String = ""
-
-    // Query de SwiftData para obtener todas las tarjetas guardadas
-    // NOTA: Para simular sin SwiftData, se podría usar @State en un proyecto real.
     @Query(sort: \TullaveCard.registeredDate, order: .reverse) private var savedCards: [TullaveCard]
 
     var body: some View {
@@ -56,6 +54,7 @@ struct InfoView: View {
                                 .cornerRadius(8)
                                 .foregroundColor(.white) // Texto del input blanco
                                 .accentColor(.maasPrimary) // Cursor verde
+                                .focused($serialFieldFocused)
 
                             if viewModel.isLoading {
                                 ProgressView("Verificando...")
@@ -120,11 +119,29 @@ struct InfoView: View {
                 }
                 .scrollContentBackground(.hidden) // Oculta el fondo blanco de la lista
                 .listStyle(.grouped)
+                .gesture(
+                    TapGesture()
+                        .onEnded { _ in
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        }
+                )
             }
             .navigationTitle("Gestión Tullave")
             .toolbarColorScheme(.dark, for: .navigationBar)
             .onAppear {
                 viewModel.setup(context: modelContext)
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
+            .onDisappear {
+                serialFieldFocused = false
+            }
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") {
+                    serialFieldFocused = false
+                }
             }
         }
     }

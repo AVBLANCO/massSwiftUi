@@ -33,4 +33,8 @@ Aquí inyectamos los **ViewModels** y usamos `@Query`.
 
 ---
 
-
+##📍 Ruta
+### 1: RequestLocation:
+manager.requestLocation(): ideal para una solicitud única y eficiente de la ubicación.
+### 1: startUpdatingLocation:
+manager.startUpdatingLocation(): mantiene el seguimiento continuo, pero puede consumir más bate

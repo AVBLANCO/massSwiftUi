@@ -22,25 +22,47 @@ struct MapView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                // El error de Identifiable se resuelve con la extensión en MapAnnotationExtension.swift
-                Map(coordinateRegion: $region, annotationItems: stops, annotationContent: { stop in
-                    // MapMarker requiere que 'stop' sea Identifiable
-                    MapMarker(coordinate: stop.coordinate, tint: .red)
-                })
-                .edgesIgnoringSafeArea(.all)
+            // Usamos ZStack para asegurar que el fondo oscuro cubra toda el área.
+            ZStack {
+                Color.maasDark.ignoresSafeArea()
 
-                // Overlay de información
                 VStack {
-                    Text("Paraderos Cercanos (Max. 1000m)")
-                        .font(.headline)
-                        .padding(.top, 8)
-                    Text(locationManager.locationStatusText)
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                    // El mapa ocupa la mayor parte de la pantalla.
+                    Map(coordinateRegion: $region, annotationItems: stops, annotationContent: { stop in
+                        MapMarker(coordinate: stop.coordinate, tint: .maasPrimary) // Marcador en verde principal
+                    })
+                    .edgesIgnoringSafeArea(.all)
+
+                    // --- Overlay de información (Estilizado) ---
+                    VStack {
+                        Text("Paraderos Cercanos (Max. 1000m)")
+                            .font(.titleMedium)
+                            .fontWeight(.bold)
+                            .foregroundColor(.maasPrimary) // Título en verde principal
+                            .padding(.top, 10)
+
+                        Text(locationManager.locationStatusText)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+
+                        // Si hay paradas, muestra el conteo.
+                        if !stops.isEmpty {
+                            Text("\(stops.count) paraderos encontrados.")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.8))
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    // Fondo oscuro y redondeado para el contenedor de información
+                    .background(
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.black.opacity(0.7))
+                            .shadow(color: .black.opacity(0.5), radius: 5, x: 0, y: -2)
+                    )
+                    .padding([.horizontal, .bottom]) // Separación de los bordes
+                    .offset(y: -50) // Mueve la caja un poco hacia arriba del borde inferior
                 }
-                .padding(.bottom, 10)
-                .background(Color.white.opacity(0.95))
             }
             .onAppear {
                 locationManager.requestLocation()
@@ -64,8 +86,8 @@ struct MapView: View {
                     }
                 }
             }
-            .navigationTitle("Mapa")
-            .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
+            .navigationTitle("Mapa de Rutas")
+            .toolbarColorScheme(.dark, for: .navigationBar) // Barra de navegación oscura
         }
     }
 }
